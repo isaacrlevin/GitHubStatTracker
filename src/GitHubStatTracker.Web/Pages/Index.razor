@@ -76,7 +76,7 @@
                                         <input id="btnSubmit" @onclick="SubmitRepos" type="button" class="btn btn-primary" value="Enable Sync for Selected Repos" />
                                     </span>
 
-                                    <TelerikWindow Class="demo-window" Width="500px" Height="300px" Centered="true" Visible=@WindowVisible Modal="true">
+                                    <TelerikWindow Class="demo-window" Width="500px" Height="300px" Centered="true" Visible=@WindowVisible Modal="true" VisibleChanged="@VisibleChangedHandler">
                                         <WindowTitle>
                                             <strong>Update Repositories</strong>
                                         </WindowTitle>
@@ -174,10 +174,7 @@
                                                     <ChartValueAxisMajorGridLines Visible="false" />
                                                 </ChartValueAxis>
                                             </ChartValueAxes>
-
                                         </TelerikChart>
-
-
                                     }
                                 </ContentTemplate>
                             </SpinLoader>
@@ -217,6 +214,12 @@
         Repos = (FullModel.Repos.ToDataSourceResult(request).Data as IEnumerable<RepoViewModel>).ToList();
     }
 
+    void VisibleChangedHandler(bool currVisible)
+    {
+        WindowVisible = currVisible; // if you don't do this, the window won't close because of the user action
+    }
+
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -250,7 +253,8 @@
             }
 
             FullModel.Sample = (await _tableService.GetDataForUserRepo("isaacrlevinPresenceLight", CancellationToken.None)).ConvertToViewModel();
-            Repos = (List<RepoViewModel>)FullModel.Repos.DeepClone();
+            //Repos = (List<RepoViewModel>)FullModel.Repos.DeepClone();
+            Repos = FullModel.Repos;
             isLoading = false;
         }
         catch (Exception e)
@@ -270,6 +274,7 @@
         }
         else
         {
+            WindowVisible = false;
             string accessToken = _accessor.AccessToken;
             _gitHubService.AuthClient(accessToken);
             foreach (var repo in FullModel.Repos)
