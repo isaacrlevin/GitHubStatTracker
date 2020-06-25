@@ -1,0 +1,342 @@
+﻿@page "/"
+
+@using GitHubStatTracker.Core.Models
+@using Force.DeepCloner
+@inject GitHubStatTracker.Core.Services.TableStorageService _tableService
+@inject GitHubStatTracker.Core.Services.GitHubService _gitHubService
+@inject TokenProvider _accessor
+@using Telerik.DataSource
+@using Telerik.DataSource.Extensions
+<div class="container text-body">
+    <div class="row">
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="centering">
+                    <AuthorizeView>
+                        <Authorized>
+                            <SpinLoader Center="true" Size="100px" css="my-spinner" IsLoading="@isLoading">
+                                <ContentTemplate>
+                                    <h1> Repos for @_accessor.UserName</h1>
+                                    @if (FullModel?.Repos != null)
+                                    {
+                                        <TelerikListView Data=@Repos Pageable="true">
+                                            <HeaderTemplate>
+                                                <div>Filter by Repository Name</div>
+                                                <TelerikTextBox @bind-Value="@FilterText"></TelerikTextBox>
+                                                <TelerikButton OnClick="@Filter">Filter</TelerikButton>
+                                                <TelerikButton OnClick="@ClearFilter">Clear Filter</TelerikButton>
+                                            </HeaderTemplate>
+                                            <Template Context="repo">
+                                                <div class="col-10 col-lg-9 d-inline-block" style="font-size:14px!important">
+                                                    <div class="d-inline-block mb-1">
+                                                        <h3 class="wb-break-all">
+                                                            <input type="checkbox" @bind="@repo.SyncEnabled" />
+                                                            <a target="_blank" href="https://github.com/@_accessor.UserName/@repo.Name" class="rgh-discussion-links">
+                                                                @repo.Name
+                                                            </a>
+                                                        </h3>
+                                                    </div>
+                                                    <div>
+                                                        <p class="col-9 d-inline-block text-gray mb-2 pr-4">
+                                                            @repo.Description
+                                                        </p>
+                                                    </div>
+                                                    <div class="f6 text-gray mt-2">
+
+                                                        <a class="muted-link mr-3" target="_blank" href="https://github.com/@_accessor.UserName/@repo.Name/stargazers">
+                                                            <svg aria-label="star" class="octicon octicon-star" viewBox="0 0 16 16" version="1.1" width="16" height="16" role="img">
+                                                                <path fill-rule="evenodd" d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.818 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25zm0 2.445L6.615 5.5a.75.75 0 01-.564.41l-3.097.45 2.24 2.184a.75.75 0 01.216.664l-.528 3.084 2.769-1.456a.75.75 0 01.698 0l2.77 1.456-.53-3.084a.75.75 0 01.216-.664l2.24-2.183-3.096-.45a.75.75 0 01-.564-.41L8 2.694v.001z">
+                                                                </path>
+                                                            </svg>
+                                                            @repo.StarCount
+                                                        </a>
+                                                        <a class="muted-link mr-3" target="_blank" href="https://github.com/@_accessor.UserName/@repo.Name/network/members">
+                                                            <svg aria-label="fork" class="octicon octicon-repo-forked" viewBox="0 0 16 16" version="1.1" width="16" height="16" role="img">
+                                                                <path fill-rule="evenodd" d="M5 3.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm0 2.122a2.25 2.25 0 10-1.5 0v.878A2.25 2.25 0 005.75 8.5h1.5v2.128a2.251 2.251 0 101.5 0V8.5h1.5a2.25 2.25 0 002.25-2.25v-.878a2.25 2.25 0 10-1.5 0v.878a.75.75 0 01-.75.75h-4.5A.75.75 0 015 6.25v-.878zm3.75 7.378a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm3-8.75a.75.75 0 100-1.5.75.75 0 000 1.5z">
+                                                                </path>
+                                                            </svg>
+                                                            @repo.ForksCount
+                                                        </a>
+                                                        Repo Last Updated @repo.UpdatedAt.ToLocalTime().ToShortDateString()
+                                                        <br />
+                                                        <br />
+                                                        @if (repo.SyncSince != null)
+                                                            {
+                                                            <a href="/Traffic?userrepo=@repo.UserRepo" class="rgh-discussion-links">
+                                                                View Traffic for Repo since @repo.SyncSince.Value.ToShortDateString()
+                                                            </a>
+                                                            }
+                                                    </div>
+                                                </div>
+                                                <br /><br />
+                                            </Template>
+                                        </TelerikListView>
+                                    }
+                                    <span class="back-to-top" style="display: inline;">
+                                        <input id="btnSubmit" @onclick="SubmitRepos" type="button" class="btn btn-primary" value="Enable Sync for Selected Repos" />
+                                    </span>
+
+                                    <TelerikWindow Class="demo-window" Width="500px" Height="300px" Centered="true" Visible=@WindowVisible Modal="true">
+                                        <WindowTitle>
+                                            <strong>Update Repositories</strong>
+                                        </WindowTitle>
+                                        <WindowActions>
+                                            <WindowAction Name="Close" />
+                                        </WindowActions>
+                                        <WindowContent>
+                                            <p>You have more than 10 repositories selected.</p>
+                                        </WindowContent>
+                                    </TelerikWindow>
+                                </ContentTemplate>
+                            </SpinLoader>
+                        </Authorized>
+                        <NotAuthorized>
+                            <SpinLoader Center="true" Size="100px" css="my-spinner" IsLoading="@isLoading">
+                                <ContentTemplate>
+                                    <h1>GitHub Stat Tracker</h1>
+                                    <br />
+                                    <br />
+                                    <br />
+                                    <div class="card-columns">
+                                        <div class="card bg-light">
+                                            <br />
+                                            <h3>What is this site?</h3>
+                                            <div class="card-body text-center">
+                                                <p class="card-text">
+                                                    GitHub Stat Tracker is a place for you to track your GitHub Traffic stats over time. The current duration where you can see this data in GitHub is 2 weeks.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="card bg-light">
+                                            <br />
+                                            <h3>How much is is?</h3>
+                                            <div class="card-body text-center">
+                                                <p class="card-text">
+                                                    It is 100% free!!! The code is available on <a href="https://github.com/isaacrlevin/GitHubStatTracker-Web" target="_blank">GitHub</a>. Right now, you can add up to 10 repos, and I may increase it based on what my Azure bill looks like.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="card bg-light">
+                                            <br />
+                                            <h3>How do you store it?</h3>
+                                            <div class="card-body text-center">
+                                                <p class="card-text">
+                                                    GitHub Stat Tracker uses an Azure Function and Azure Table Storage to query and store your GitHub Traffic Data, meaning as long as you configure your repo to sync, the data will be there.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-center">
+                                        <form action="/api/account/signin" method="post">
+                                            <input type="hidden" name="Provider" value="GitHub" />
+                                            <button class="btn btn-lg btn-success m-1" type="submit">Get Started</button>
+                                        </form>
+                                    </div>
+                                    <br />
+                                    <br />
+                                    <br />
+                                    @if (FullModel.Sample != null && FullModel.Sample.CloneSummary != null)
+                                    {
+                                        <h1>Sample</h1>
+                                        <TelerikChart>
+                                            <ChartTitle Text="Clones for isaacrlevin PresenceLight" />
+                                            <ChartTooltip Visible="true" Shared="true"></ChartTooltip>
+                                            <ChartSeriesItems>
+
+                                                <ChartSeries Type="ChartSeriesType.Line"
+                                                             Name="Clones"
+                                                             Data="@FullModel.Sample.CloneSummary"
+                                                             CategoryField="Date"
+                                                             Field="Count"
+                                                             Style="ChartSeriesStyle.Normal">
+                                                    <ChartSeriesMarkers Visible="false" />
+                                                </ChartSeries>
+
+                                                <ChartSeries Type="ChartSeriesType.Line"
+                                                             Name="Unique Clones"
+                                                             Data="@FullModel.Sample.CloneSummary"
+                                                             CategoryField="Date"
+                                                             Field="Uniques"
+                                                             Style="ChartSeriesStyle.Normal">
+                                                    <ChartSeriesMarkers Visible="false" />
+                                                </ChartSeries>
+
+                                            </ChartSeriesItems>
+                                            <ChartCategoryAxes>
+                                                <ChartCategoryAxis BaseUnit="ChartCategoryAxisBaseUnit.Fit" WeekStartDay="1" Type="ChartCategoryAxisType.Date">
+                                                    <ChartCategoryAxisLabels Format="{0:dd MMM}" />
+                                                    <ChartCategoryAxisMajorGridLines Visible="false" />
+                                                </ChartCategoryAxis>
+                                            </ChartCategoryAxes>
+
+                                            <ChartValueAxes>
+                                                <ChartValueAxis>
+                                                    <ChartValueAxisMajorGridLines Visible="false" />
+                                                </ChartValueAxis>
+                                            </ChartValueAxes>
+
+                                        </TelerikChart>
+
+
+                                    }
+                                </ContentTemplate>
+                            </SpinLoader>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code
+{
+    public IndexViewModel FullModel { get; set; }
+    public List<RepoViewModel> Repos { get; set; }
+    bool WindowVisible = false;
+    bool isLoading = false;
+    public string FilterText { get; set; } = string.Empty;
+    public int Page { get; set; } = 1;
+    public int PageSize { get; set; } = 5;
+
+    private void ClearFilter()
+    {
+        FilterText = string.Empty;
+        Filter();
+    }
+
+    private void Filter()
+    {
+        var request = new DataSourceRequest()
+        {
+            Filters = new List<IFilterDescriptor>()
+        };
+        request.Filters.Add(new FilterDescriptor("Name", FilterOperator.Contains, FilterText));
+
+        Repos = (FullModel.Repos.ToDataSourceResult(request).Data as IEnumerable<RepoViewModel>).ToList();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            FullModel = new IndexViewModel();
+            if (_accessor?.IsAuthenticated ?? false)
+            {
+                string accessToken = _accessor.AccessToken;
+                _gitHubService.AuthClient(accessToken);
+
+                var repos = (await _gitHubService.GetReposForUser(_accessor.UserName)).Select(a => a.ConvertToViewModel()).ToList();
+
+                var results = await _tableService.GetDataForUser(_accessor.UserName, CancellationToken.None);
+
+                foreach (var repo in repos)
+                {
+                    var tempRepo = results.Where(a => a.RepoName == repo.Name).OrderBy(a => DateTime.Parse(a.Date)).FirstOrDefault();
+                    if (tempRepo != null)
+                    {
+                        repo.SyncEnabled = true;
+                        repo.SyncSince = DateTime.Parse(tempRepo.Date);
+                    }
+                    repo.UserRepo = _accessor.UserName + repo.Name;
+                }
+
+                FullModel = new IndexViewModel
+                {
+                    Repos = repos.OrderByDescending(a => a.SyncEnabled == true).ThenByDescending(a => a.StarCount).ToList()
+                };
+            }
+
+            FullModel.Sample = (await _tableService.GetDataForUserRepo("isaacrlevinPresenceLight", CancellationToken.None)).ConvertToViewModel();
+            Repos = (List<RepoViewModel>)FullModel.Repos.DeepClone();
+            isLoading = false;
+        }
+        catch (Exception e)
+        {
+            var foo = e;
+        }
+    }
+
+    private async Task SubmitRepos()
+    {
+        isLoading = true;
+
+        var count = FullModel.Repos.Where(a => a.SyncEnabled).ToList().Count;
+        if (count > 10)
+        {
+            WindowVisible = true;
+        }
+        else
+        {
+            string accessToken = _accessor.AccessToken;
+            _gitHubService.AuthClient(accessToken);
+            foreach (var repo in FullModel.Repos)
+            {
+                Console.WriteLine(repo.Name);
+                if (repo.SyncEnabled)
+                {
+                    var latestRepo = (await _tableService.GetDataForUserRepo($"{_accessor.UserName}{repo.Name}", CancellationToken.None))
+                        .Where(a => a.Date == DateTime.Now.ToUniversalTime().ToShortDateString()).ToList();
+
+                    var firstStat = new RepoStatEntity($"{_accessor.UserName}{repo.Name}", DateTime.Now.ToUniversalTime().ToShortDateString().Replace("/", ""))
+                    {
+                        AccessToken = _accessor.AccessToken,
+                        RepoName = repo.Name,
+                        Date = DateTime.Now.ToUniversalTime().ToShortDateString(),
+                        StarCount = repo.StarCount,
+                        ForksCount = repo.ForksCount,
+                        RepoId = repo.Id,
+                        UserName = _accessor.UserName,
+                        SyncEnabled = repo.SyncEnabled
+                    };
+
+                    await _tableService.InsertOrMergeEntityAsync(firstStat);
+
+
+                    if (latestRepo.Count == 0)
+                    {
+                        List<RepoStatEntity> stats = new List<RepoStatEntity>();
+
+                        var views = await _gitHubService.GetRepoViews(repo.Id);
+                        var clones = await _gitHubService.GetRepoClones(repo.Id);
+                        foreach (var view in views.Views)
+                        {
+                            Console.WriteLine(view.Timestamp.DateTime.ToShortDateString());
+                            var stat = new RepoStatEntity($"{_accessor.UserName}{repo.Name}", view.Timestamp.UtcDateTime.ToShortDateString().Replace("/", ""))
+                            {
+                                AccessToken = accessToken,
+                                RepoName = repo.Name,
+                                Date = view.Timestamp.UtcDateTime.ToShortDateString(),
+                                RepoId = repo.Id,
+                                UserName = _accessor.UserName,
+                                SyncEnabled = repo.SyncEnabled,
+
+                                Views = view.Count,
+                                UniqueUsers = view.Uniques
+                            };
+
+
+                            var clone = clones.Clones.Where(a => a.Timestamp.UtcDateTime.ToShortDateString() == view.Timestamp.UtcDateTime.ToShortDateString()).FirstOrDefault();
+
+                            if (clone != null)
+                            {
+                                stat.Clones = clone.Count;
+                                stat.UniqueClones = clone.Uniques;
+                            }
+                            stats.Add(stat);
+
+
+                        }
+                        foreach (var view in stats)
+                        {
+                            await _tableService.InsertOrMergeEntityAsync(view);
+                        }
+                    }
+                }
+            }
+        }
+        isLoading = false;
+    }
+}

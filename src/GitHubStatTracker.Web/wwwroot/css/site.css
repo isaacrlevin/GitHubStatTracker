@@ -1,0 +1,179 @@
+﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+a.navbar-brand {
+    white-space: normal;
+    text-align: center;
+    word-break: break-all;
+}
+
+/* Provide sufficient contrast against white background */
+a {
+    color: #0366d6;
+}
+
+.demo-window {
+    z-index: 44444;
+}
+
+.my-spinner {
+    height: 100%;
+    vertical-align: central;
+    --sk-size: 200px;
+    --sk-color: #003366;
+}
+
+@media (min-width: 1600px) {
+    .container {
+        max-width: 1520px;
+    }
+}
+
+.k-listview {
+    border: none !important;
+    font-size: x-large !important;
+}
+
+.k-textbox {
+    margin-top: 20px !important;
+}
+
+.k-label {
+    font-size: x-large !important;
+}
+
+.k-dateinput {
+    margin-top: 20px !important;
+}
+
+hr.style-eight {
+    height: 10px;
+    border: 1;
+    box-shadow: inset 0 9px 9px -3px rgba(11, 99, 184, 0.8);
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.k-button {
+    margin-top: 20px !important;
+}
+
+.k-listview-header {
+    margin-bottom: 20px !important;
+    border: none !important;
+}
+
+.card {
+    text-align: center;
+    height: 250px;
+}
+
+.muted-link {
+    color: #586069;
+    text-decoration: none !important;
+}
+
+    .muted-link:hover {
+        color: #0366d6;
+    }
+
+.btn-primary {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+
+.k-pager-numbers .k-link {
+    color: #0366d6 !important;
+    background-color: white !important;
+}
+
+.back-to-top {
+    background: none;
+    margin: 0;
+    position: fixed;
+    top: 80px;
+    right: 420px;
+    width: 32px;
+    height: 32px;
+    z-index: 100;
+    text-decoration: none;
+}
+
+#blazor-error-ui {
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.border-top {
+    border-top: 1px solid #e5e5e5;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+    font-size: 1rem;
+    line-height: inherit;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px; /* Vertically center the text there */
+}

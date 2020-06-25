@@ -1,0 +1,29 @@
+﻿@page "/loginControl"
+@using System.Web;
+
+<ul class="navbar-nav">
+    <AuthorizeView>
+        <Authorized>
+            <li class="dropdown open">
+                <a href="#" class="dropdown-toggle" id="navuser" style="color: #212529;" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true"> Hello @context.User.Identity.Name! <span class="caret"></span> </a>
+                <ul class="dropdown-menu" aria-labelledby="navuser">
+                    <li><a style="color: #212529;padding:10px" href="/api/account/signout?returnUrl=%2F">Sign Out</a></li>
+                </ul>
+            </li>
+        </Authorized>
+        <NotAuthorized>
+            <li class="nav-item">
+                <form action="/api/account/signin" method="post">
+                    <input type="hidden" name="Provider" value="GitHub" />
+                    <label>
+                        <span id="searchButton" style="cursor:pointer" class="search icon-small open-btn">Signin to GitHub</span>
+                        <button class="btn btn-lg btn-success m-1" style="display:none" type="submit">Connect using GitHub</button>
+                    </label>
+                </form>
+            </li>
+        </NotAuthorized>
+    </AuthorizeView>
+</ul>
+
+@code {
+}

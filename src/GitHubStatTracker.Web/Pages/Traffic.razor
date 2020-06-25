@@ -1,0 +1,271 @@
+﻿@page "/traffic"
+
+@using Force.DeepCloner
+@using Microsoft.AspNetCore.WebUtilities
+@inject GitHubStatTracker.Core.Services.TableStorageService _tableService
+@inject GitHubStatTracker.Core.Services.GitHubService _gitHubService
+@inject TokenProvider _accessor
+@inject NavigationManager NavManager
+
+
+<AuthorizeView>
+    <Authorized>
+        <SpinLoader Center="true" Size="100px" css="my-spinner" IsLoading="@(FullModel.Repo == null)">
+            <ContentTemplate>
+                @if (userrepo.Contains(_accessor?.UserName))
+                {
+                    @if (Model?.Repo == null)
+                    {
+                        <div class="centering text-center">
+                            <h1>You are not collecting insights for this repo</h1>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="centering text-center">
+                            <h1>GitHub Traffic Data for @FullModel.Repo.Name</h1>
+                        </div>
+                        <br /><br /><br />
+                        <div style="width:100%">
+                            <div style="width:50%; float:left;">
+                                <span> Insights being collected since @FullModel.Repo.SyncSince.Value.ToShortDateString()</span>
+                            </div>
+                            <div style="width:50%; float: right">
+                                <TelerikDateRangePicker StartValue="@StartValue"
+                                                        EndValue="@EndValue"
+                                                        StartValueChanged="@( (DateTime? sV) => StartValueChangedHandler(sV) )"
+                                                        EndValueChanged="@( (DateTime? eV) => EndValueChangedHandler(eV) )">
+                                </TelerikDateRangePicker>
+                            </div>
+                        </div>
+                        <br /><br />
+                        <br /><br />
+                              <hr class="style-eight" />
+                        @if (Model?.CloneSummary != null && Model?.CloneSummary.Count > 0)
+                        {
+                            var cloneTitle = $"GitHub Clones for {@Model.Repo.Name}";
+                            <TelerikChart>
+                                <ChartTitle Text="@cloneTitle" />
+                                <ChartTooltip Visible="true" Shared="true"></ChartTooltip>
+                                <ChartSeriesItems>
+                                    <ChartSeries Type="ChartSeriesType.Line"
+                                                 Name="Clones"
+                                                 Data="@Model.CloneSummary"
+                                                 CategoryField="Date"
+                                                 Field="Count"
+                                                 Style="ChartSeriesStyle.Normal">
+                                        <ChartSeriesMarkers Visible="false" />
+                                    </ChartSeries>
+
+                                    <ChartSeries Type="ChartSeriesType.Line"
+                                                 Name="Unique Clones"
+                                                 Data="@Model.CloneSummary"
+                                                 CategoryField="Date"
+                                                 Field="Uniques"
+                                                 Style="ChartSeriesStyle.Normal">
+                                        <ChartSeriesMarkers Visible="false" />
+                                    </ChartSeries>
+
+                                </ChartSeriesItems>
+                                <ChartCategoryAxes>
+                                    <ChartCategoryAxis BaseUnit="ChartCategoryAxisBaseUnit.Days" WeekStartDay="1" Type="ChartCategoryAxisType.Date">
+                                        <ChartCategoryAxisLabels>
+                                            <ChartCategoryAxisLabelsRotation Angle="-90"></ChartCategoryAxisLabelsRotation>
+                                        </ChartCategoryAxisLabels>
+
+                                        <ChartCategoryAxisMajorGridLines Visible="false" />
+
+                                    </ChartCategoryAxis>
+                                </ChartCategoryAxes>
+
+                                <ChartValueAxes>
+                                    <ChartValueAxis>
+                                        <ChartValueAxisMajorGridLines Visible="false" />
+                                    </ChartValueAxis>
+                                </ChartValueAxes>
+                            </TelerikChart>
+                            <br />
+                        }
+
+                        @if (Model?.ViewSummary != null && Model?.ViewSummary.Count > 0)
+                        {
+                            var cloneTitle = $"GitHub Views for {@Model.Repo.Name}";
+                            <TelerikChart>
+                                <ChartTitle Text="@cloneTitle" />
+                                <ChartTooltip Visible="true" Shared="true"></ChartTooltip>
+                                <ChartSeriesItems>
+                                    <ChartSeries Type="ChartSeriesType.Line"
+                                                 Name="Views"
+                                                 Data="@Model.ViewSummary"
+                                                 CategoryField="Date"
+                                                 Field="Count"
+                                                 Style="ChartSeriesStyle.Normal">
+                                        <ChartSeriesMarkers Visible="false" />
+                                    </ChartSeries>
+
+                                    <ChartSeries Type="ChartSeriesType.Line"
+                                                 Name="Unique Views"
+                                                 Data="@Model.ViewSummary"
+                                                 CategoryField="Date"
+                                                 Field="Uniques"
+                                                 Style="ChartSeriesStyle.Normal">
+                                        <ChartSeriesMarkers Visible="false" />
+                                    </ChartSeries>
+
+                                </ChartSeriesItems>
+                                <ChartCategoryAxes>
+                                    <ChartCategoryAxis BaseUnit="ChartCategoryAxisBaseUnit.Days" WeekStartDay="1" Type="ChartCategoryAxisType.Date">
+                                        <ChartCategoryAxisLabels>
+                                            <ChartCategoryAxisLabelsRotation Angle="-90"></ChartCategoryAxisLabelsRotation>
+                                        </ChartCategoryAxisLabels>
+
+                                        <ChartCategoryAxisMajorGridLines Visible="false" />
+
+                                    </ChartCategoryAxis>
+                                </ChartCategoryAxes>
+
+                                <ChartValueAxes>
+                                    <ChartValueAxis>
+                                        <ChartValueAxisMajorGridLines Visible="false" />
+                                    </ChartValueAxis>
+                                </ChartValueAxes>
+                            </TelerikChart>
+                            <br />
+                        }
+
+                        @if (Model?.StarsSummary != null && Model?.StarsSummary.Count > 0)
+                        {
+                            var cloneTitle = $"GitHub Stars for {@Model.Repo.Name}";
+                            <TelerikChart>
+                                <ChartTitle Text="@cloneTitle" />
+                                <ChartTooltip Visible="true" Shared="true"></ChartTooltip>
+                                <ChartSeriesItems>
+                                    <ChartSeries Type="ChartSeriesType.Line"
+                                                 Name="Stars"
+                                                 Data="@Model.StarsSummary"
+                                                 CategoryField="Date"
+                                                 Field="Count"
+                                                 Style="ChartSeriesStyle.Normal">
+                                        <ChartSeriesMarkers Visible="false" />
+                                    </ChartSeries>
+
+                                </ChartSeriesItems>
+                                <ChartCategoryAxes>
+                                    <ChartCategoryAxis BaseUnit="ChartCategoryAxisBaseUnit.Days" WeekStartDay="1" Type="ChartCategoryAxisType.Date">
+                                        <ChartCategoryAxisLabels>
+                                            <ChartCategoryAxisLabelsRotation Angle="-90"></ChartCategoryAxisLabelsRotation>
+                                        </ChartCategoryAxisLabels>
+
+                                        <ChartCategoryAxisMajorGridLines Visible="false" />
+
+                                    </ChartCategoryAxis>
+                                </ChartCategoryAxes>
+
+                                <ChartValueAxes>
+                                    <ChartValueAxis>
+                                        <ChartValueAxisMajorGridLines Visible="false" />
+                                    </ChartValueAxis>
+                                </ChartValueAxes>
+                            </TelerikChart>
+                            <br />
+                        }
+
+                        @if (Model?.ForksSummary != null && Model?.ForksSummary.Count > 0)
+                        {
+                            var cloneTitle = $"GitHub Forks for {@Model.Repo.Name}";
+                            <TelerikChart>
+                                <ChartTitle Text="@cloneTitle" />
+                                <ChartTooltip Visible="true" Shared="true"></ChartTooltip>
+                                <ChartSeriesItems>
+                                    <ChartSeries Type="ChartSeriesType.Line"
+                                                 Name="Forks"
+                                                 Data="@Model.ForksSummary"
+                                                 CategoryField="Date"
+                                                 Field="Count"
+                                                 Style="ChartSeriesStyle.Normal">
+                                        <ChartSeriesMarkers Visible="false" />
+                                    </ChartSeries>
+
+                                </ChartSeriesItems>
+                                <ChartCategoryAxes>
+                                    <ChartCategoryAxis BaseUnit="ChartCategoryAxisBaseUnit.Days" WeekStartDay="1" Type="ChartCategoryAxisType.Date">
+                                        <ChartCategoryAxisLabels>
+                                            <ChartCategoryAxisLabelsRotation Angle="-90"></ChartCategoryAxisLabelsRotation>
+                                        </ChartCategoryAxisLabels>
+
+                                        <ChartCategoryAxisMajorGridLines Visible="false" />
+
+                                    </ChartCategoryAxis>
+                                </ChartCategoryAxes>
+
+                                <ChartValueAxes>
+                                    <ChartValueAxis>
+                                        <ChartValueAxisMajorGridLines Visible="false" />
+                                    </ChartValueAxis>
+                                </ChartValueAxes>
+                            </TelerikChart>
+                            <br />
+                        }
+                    }
+                }
+            </ContentTemplate>
+        </SpinLoader>
+    </Authorized>
+    <NotAuthorized>
+        You are not logged in
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    string userrepo = string.Empty;
+    TrafficViewModel FullModel { get; set; }
+
+    TrafficViewModel Model { get; set; }
+
+    public DateTime? StartValue { get; set; }
+    public DateTime? EndValue { get; set; } = DateTime.Now;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        FullModel = new TrafficViewModel();
+        Model = new TrafficViewModel();
+        var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("userrepo", out var _userrepo))
+        {
+            userrepo = _userrepo;
+            if (userrepo.ToLower().Contains(_accessor.UserName.ToLower()))
+            {
+                FullModel = (await _tableService.GetDataForUserRepo(userrepo, CancellationToken.None)).ConvertToViewModel();
+                FullModel.Repo.SyncSince = FullModel.ViewSummary.OrderBy(a => a.Date).FirstOrDefault().Date;
+                Model = (TrafficViewModel)FullModel.DeepClone();
+                StartValue = Model.Repo.SyncSince;
+            }
+        }
+    }
+
+    async Task StartValueChangedHandler(DateTime? currStart)
+    {
+        if (currStart != null)
+        {
+            StartValue = currStart;
+            Model.CloneSummary = FullModel.CloneSummary.Where(a => StartValue <= a.Date && a.Date <= EndValue.Value).ToList();
+            Model.ViewSummary = FullModel.ViewSummary.Where(a => StartValue <= a.Date && a.Date <= EndValue.Value).ToList();
+            Model.StarsSummary = FullModel.StarsSummary.Where(a => StartValue <= a.Date && a.Date <= EndValue.Value).ToList();
+            Model.ForksSummary = FullModel.ForksSummary.Where(a => StartValue <= a.Date && a.Date <= EndValue.Value).ToList();
+        }
+    }
+
+    async Task EndValueChangedHandler(DateTime? currEnd)
+    {
+        if (currEnd != null)
+        {
+            EndValue = currEnd;
+            Model.CloneSummary = FullModel.CloneSummary.Where(a => StartValue <= a.Date && a.Date <= EndValue.Value).ToList();
+            Model.ViewSummary = FullModel.ViewSummary.Where(a => StartValue <= a.Date && a.Date <= EndValue.Value).ToList();
+            Model.StarsSummary = FullModel.StarsSummary.Where(a => StartValue <= a.Date && a.Date <= EndValue.Value).ToList();
+            Model.ForksSummary = FullModel.ForksSummary.Where(a => StartValue <= a.Date && a.Date <= EndValue.Value).ToList();
+        }
+    }
+}
