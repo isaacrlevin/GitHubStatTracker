@@ -31,6 +31,8 @@ namespace GitHubStatTracker.Web.Models
         public bool SyncEnabled { get; set; }
         public DateTime? SyncSince { get; set; }
 
+        public string RepoUrl { get; set; }
+
         public string UserRepo { get; set; }
     }
 

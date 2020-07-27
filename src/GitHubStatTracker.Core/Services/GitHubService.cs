@@ -38,7 +38,10 @@ namespace GitHubStatTracker.Core.Services
 
         public async Task<IReadOnlyList<Repository>> GetReposForUser(string login)
         {
-            return (await client.Repository.GetAllForUser(login));
+            return (await client.Repository.GetAllForCurrent(new RepositoryRequest()
+            {
+                Affiliation = RepositoryAffiliation.All
+            }));
         }
 
         public async Task<Repository> GetRepository(int id)

@@ -24,7 +24,8 @@ namespace GitHubStatTracker.Web.Extensions
                 ForksCount = context.ForksCount,
                 Id = (int)context.Id,
                 StarCount = context.StargazersCount,
-                UpdatedAt = context.UpdatedAt.DateTime
+                UpdatedAt = context.UpdatedAt.DateTime,
+                RepoUrl = context.HtmlUrl
             };
         }
 

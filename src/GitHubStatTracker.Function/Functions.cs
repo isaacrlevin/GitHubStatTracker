@@ -12,13 +12,6 @@ namespace GitHubStatTracker.Function
 {
     public  class Functions
     {
-        //private readonly TrackRepos _track;
-
-        //public Functions(TrackRepos track)
-        //{
-        //    _track = track;
-        //}
-
         private readonly TrackRepos t;
 
         public Functions(TrackRepos _t)
@@ -27,7 +20,7 @@ namespace GitHubStatTracker.Function
         }
 
         [FunctionName("TrackReposTimer")]
-        public  async void TrackReposTimer([TimerTrigger("0 0 0 * * *")] TimerInfo myTimer, ILogger log, ExecutionContext context)//, TrackRepos _track)
+        public async void TrackReposTimer([TimerTrigger("0 0 8 * * *")] TimerInfo myTimer, ILogger log, ExecutionContext context)//, TrackRepos _track)
         {
             log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
             await t.Run();
