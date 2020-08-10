@@ -17,11 +17,11 @@ using System.Threading.Tasks;
 
 namespace GitHubStatTracker.Function
 {
-    public class TrackRepos
+    public class GHSTTrackRepos
     {
         private readonly GitHubService _gitHubService;
         private readonly TableStorageService _tableService;
-        public TrackRepos(IOptions<OAuthOptions> options, GitHubService gitHubService, TableStorageService tableService)
+        public GHSTTrackRepos(IOptions<OAuthOptions> options, GitHubService gitHubService, TableStorageService tableService)
         {
             _tableService = tableService;
             _gitHubService = gitHubService;
@@ -29,7 +29,7 @@ namespace GitHubStatTracker.Function
         public async Task Run()
         {
             List<RepoStatEntity> stats = new List<RepoStatEntity>();
-            var repos = await _tableService.GetActiveRepos();
+            var repos = await _tableService.GetActiveRepos("GitHubRepoStats");
 
 
             List<string> dateArray = new List<string>();
@@ -87,7 +87,7 @@ namespace GitHubStatTracker.Function
 
             foreach (var view in stats)
             {
-                await _tableService.InsertOrMergeEntityAsync(view);
+                await _tableService.InsertOrMergeEntityAsync(view, "GitHubRepoStats");
             }
         }
     }

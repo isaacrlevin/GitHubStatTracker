@@ -237,7 +237,7 @@
             userrepo = _userrepo;
             if (userrepo.ToLower().Contains(_accessor.UserName.ToLower()))
             {
-                FullModel = (await _tableService.GetDataForUserRepo(userrepo, CancellationToken.None)).ConvertToViewModel();
+                FullModel = (await _tableService.GetDataForUserRepo(userrepo, "GitHubRepoStats", CancellationToken.None)).ConvertToViewModel();
                 FullModel.Repo.SyncSince = FullModel.ViewSummary.OrderBy(a => a.Date).FirstOrDefault().Date;
                 Model = (TrafficViewModel)FullModel.DeepClone();
                 StartValue = Model.Repo.SyncSince;
@@ -245,7 +245,7 @@
         }
     }
 
-    async Task StartValueChangedHandler(DateTime? currStart)
+    void StartValueChangedHandler(DateTime? currStart)
     {
         if (currStart != null)
         {
@@ -257,7 +257,7 @@
         }
     }
 
-    async Task EndValueChangedHandler(DateTime? currEnd)
+    void EndValueChangedHandler(DateTime? currEnd)
     {
         if (currEnd != null)
         {

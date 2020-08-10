@@ -61,7 +61,7 @@ namespace GitHubStatTracker.Core.Services
             return table;
         }
 
-        public async Task<RepoStatEntity> InsertOrMergeEntityAsync(RepoStatEntity entity)
+        public async Task<TableEntity> InsertOrMergeEntityAsync(TableEntity entity, string tableName)
         {
             if (entity == null)
             {
@@ -69,12 +69,12 @@ namespace GitHubStatTracker.Core.Services
             }
             try
             {
-                var table = await CreateTableAsync("GitHubRepoStats");
+                var table = await CreateTableAsync(tableName);
 
                 TableOperation insertOrMergeOperation = TableOperation.InsertOrMerge(entity);
 
                 TableResult result = await table.ExecuteAsync(insertOrMergeOperation);
-                RepoStatEntity insertedStat = result.Result as RepoStatEntity;
+                TableEntity insertedStat = result.Result as TableEntity;
 
                 return insertedStat;
             }
@@ -86,9 +86,9 @@ namespace GitHubStatTracker.Core.Services
         }
 
 
-        public async Task<List<RepoStatEntity>> GetActiveRepos()
+        public async Task<List<RepoStatEntity>> GetActiveRepos(string tableName)
         {
-            var table = await CreateTableAsync("GitHubRepoStats");
+            var table = await CreateTableAsync(tableName);
 
             var query = new TableQuery<RepoStatEntity>();
 
@@ -102,9 +102,9 @@ namespace GitHubStatTracker.Core.Services
         }
 
 
-        public async Task<List<RepoStatEntity>> GetDataForUser(string user, CancellationToken ct)
+        public async Task<List<RepoStatEntity>> GetDataForUser(string user, string tableName, CancellationToken ct)
         {
-            var table = await CreateTableAsync("GitHubRepoStats");
+            var table = await CreateTableAsync(tableName);
 
             var query = new FindWithinPartitionStartsWithByPartitionKey(user);
             var results = query.Execute(table);
@@ -112,9 +112,9 @@ namespace GitHubStatTracker.Core.Services
             return results.ToList();
         }
 
-        public async Task<List<RepoStatEntity>> GetDataForUserRepo(string userrepo, CancellationToken ct)
+        public async Task<List<RepoStatEntity>> GetDataForUserRepo(string userrepo, string tableName, CancellationToken ct)
         {
-            var table = await CreateTableAsync("GitHubRepoStats");
+            var table = await CreateTableAsync(tableName);
             var query = new TableQuery<RepoStatEntity>();
 
             var condition = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, userrepo);
@@ -122,22 +122,6 @@ namespace GitHubStatTracker.Core.Services
             var results = table.ExecuteQuery<RepoStatEntity>(query.Where(condition));
 
             return results.ToList();
-        }
-
-        public async Task<RepoStatEntity> RetrieveEntityUsingPointQueryAsync(CloudTable table, string partitionKey, string rowKey)
-        {
-            try
-            {
-                TableOperation retrieveOperation = TableOperation.Retrieve<RepoStatEntity>(partitionKey, rowKey);
-                TableResult result = await table.ExecuteAsync(retrieveOperation);
-                RepoStatEntity stat = result.Result as RepoStatEntity;
-                return stat;
-            }
-            catch (StorageException e)
-            {
-                Console.WriteLine(e.Message);
-                throw;
-            }
         }
     }
 }

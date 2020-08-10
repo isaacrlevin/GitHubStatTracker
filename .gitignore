@@ -359,3 +359,7 @@ MigrationBackup/
 /src/GitHubStatTracker.Web/Properties/ServiceDependencies/local/appInsights1.arm.json
 /src/GitHubStatTracker.Web/Properties/ServiceDependencies/ghst - Web Deploy/ghst - Web Deploy.arm.json
 /src/GitHubStatTracker.Web/Properties/ServiceDependencies/ghst - Web Deploy/appInsights1.arm.json
+/src/GitHubStatTracker.Function/www/RepoManager.html
+/src/GitHubStatTracker.Function/Properties/ServiceDependencies/craigslistsearch-function/profile.arm.json
+/src/GitHubStatTracker.Web/Properties/ServiceDependencies/ghst/profile.arm.json
+/src/GitHubStatTracker.Web/Properties/ServiceDependencies/ghst - Web Deploy/profile.arm.json

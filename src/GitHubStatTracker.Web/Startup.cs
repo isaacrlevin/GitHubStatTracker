@@ -48,8 +48,9 @@ namespace GitHubStatTracker.Web
             {
                 options.ClientId = Configuration["GitHub:ClientId"];
                 options.ClientSecret = Configuration["GitHub:ClientSecret"];
-                options.Scope.Add("user:email");
+                options.Scope.Add("user");
                 options.Scope.Add("repo");
+                options.Scope.Add("admin:org");
                 options.SaveTokens = true;
             });
 

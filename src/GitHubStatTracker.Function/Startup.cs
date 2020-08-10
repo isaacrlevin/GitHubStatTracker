@@ -14,8 +14,10 @@ namespace GitHubStatTracker.Function
     {
         public override void Configure(IFunctionsHostBuilder builder)
         {
-            builder.Services.AddSingleton<TrackRepos, TrackRepos>();
+            builder.Services.AddSingleton<GHSTTrackRepos, GHSTTrackRepos>();
+            builder.Services.AddSingleton<PBITrackRepos, PBITrackRepos>();
             builder.Services.AddSingleton<TableStorageService, TableStorageService>();
+            builder.Services.AddSingleton<BlobStorageService, BlobStorageService>();
             builder.Services.AddSingleton<GitHubService, GitHubService>();
 
             builder.Services.AddOptions<OAuthOptions>()

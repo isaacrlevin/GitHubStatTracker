@@ -233,7 +233,7 @@
 
                 var repos = (await _gitHubService.GetReposForUser(_accessor.UserName)).Select(a => a.ConvertToViewModel()).ToList();
 
-                var results = await _tableService.GetDataForUser(_accessor.UserName, CancellationToken.None);
+                var results = await _tableService.GetDataForUser(_accessor.UserName, "GitHubRepoStats", CancellationToken.None);
 
                 foreach (var repo in repos)
                 {
@@ -252,8 +252,10 @@
                 };
             }
 
-            FullModel.Sample = (await _tableService.GetDataForUserRepo("isaacrlevinPresenceLight", CancellationToken.None)).ConvertToViewModel();
-            //Repos = (List<RepoViewModel>)FullModel.Repos.DeepClone();
+
+            var entities = (await _tableService.GetDataForUserRepo("isaacrlevinpresencelight", "GitHubRepoStats", CancellationToken.None));
+            FullModel.Sample = entities.ConvertToViewModel();
+
             Repos = FullModel.Repos;
             isLoading = false;
         }
@@ -282,7 +284,7 @@
                 Console.WriteLine(repo.Name);
                 if (repo.SyncEnabled)
                 {
-                    var latestRepo = (await _tableService.GetDataForUserRepo($"{_accessor.UserName}{repo.Name}", CancellationToken.None))
+                    var latestRepo = (List<RepoStatEntity>)(await _tableService.GetDataForUserRepo($"{_accessor.UserName}{repo.Name}", "GitHubRepoStats", CancellationToken.None))
                         .Where(a => a.Date == DateTime.Now.ToUniversalTime().ToShortDateString()).ToList();
 
                     var firstStat = new RepoStatEntity($"{_accessor.UserName}{repo.Name}", DateTime.Now.ToUniversalTime().ToShortDateString().Replace("/", ""))
@@ -297,7 +299,7 @@
                         SyncEnabled = repo.SyncEnabled
                     };
 
-                    await _tableService.InsertOrMergeEntityAsync(firstStat);
+                    await _tableService.InsertOrMergeEntityAsync(firstStat,"GitHubRepoStats");
 
 
                     if (latestRepo.Count == 0)
@@ -336,7 +338,7 @@
                         }
                         foreach (var view in stats)
                         {
-                            await _tableService.InsertOrMergeEntityAsync(view);
+                            await _tableService.InsertOrMergeEntityAsync(view,"GitHubRepoStats");
                         }
                     }
                 }
