@@ -59,7 +59,7 @@ jobs:
       shell: bash
       run: |
         pushd './${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
-        dotnet build --configuration Release --output ./output
+        dotnet publish --configuration Release --output ./output
         popd
 
     - name: Azure WebApp
