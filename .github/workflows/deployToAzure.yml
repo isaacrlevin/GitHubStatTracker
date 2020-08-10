@@ -27,6 +27,20 @@ jobs:
       with:
         dotnet-version: 3.1.301
         
+    - name: Setup NuGet.exe for use with actions
+      uses: NuGet/setup-nuget@v1.0.2
+      with:
+        # NuGet version to install. Can be `latest`, `preview`, a concrete version like `5.3.1`, or a semver range specifier like `5.x`.
+        nuget-version: 'latest'
+
+   # Note: Invoke dotnet restore and point to nuget.config - Lance M.
+    - name: NuGet Restore
+      env:
+        # Note: set the environment varibles defined in nuget.config using the values in secrets - Lance M.
+        TELERIK_FEED_USERNAME: ${{ secrets.TelerikUserName  }}
+        TELERIK_FEED_PASSWORD: ${{ secrets.TelerikPassword }}
+      run: dotnet restore src/GitHubStatTracker.Web/GitHubStatTracker.Web.csproj --configfile=src/nuget.config --runtime linux-x64
+        
 
     - name: 'Build Function'
       shell: bash
