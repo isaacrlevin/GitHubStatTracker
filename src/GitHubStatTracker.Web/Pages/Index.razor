@@ -253,8 +253,7 @@
             }
 
 
-            var entities = (await _tableService.GetDataForUserRepo("isaacrlevinpresencelight", "GitHubRepoStats", CancellationToken.None));
-            FullModel.Sample = entities.ConvertToViewModel();
+            FullModel.Sample = (await _tableService.GetDataForUserRepo("isaacrlevinPresenceLight", "GitHubRepoStats", CancellationToken.None)).ConvertToViewModel();
 
             Repos = FullModel.Repos;
             isLoading = false;
@@ -299,7 +298,7 @@
                         SyncEnabled = repo.SyncEnabled
                     };
 
-                    await _tableService.InsertOrMergeEntityAsync(firstStat,"GitHubRepoStats");
+                    await _tableService.InsertOrMergeEntityAsync(firstStat, "GitHubRepoStats");
 
 
                     if (latestRepo.Count == 0)
@@ -338,7 +337,7 @@
                         }
                         foreach (var view in stats)
                         {
-                            await _tableService.InsertOrMergeEntityAsync(view,"GitHubRepoStats");
+                            await _tableService.InsertOrMergeEntityAsync(view, "GitHubRepoStats");
                         }
                     }
                 }
