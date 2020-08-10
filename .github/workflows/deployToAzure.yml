@@ -13,8 +13,6 @@ env:
   AZURE_WEBAPP_NAME: ghst
   AZURE_WEBAPP_PACKAGE_PATH: 'src/GitHubStatTracker.Web/'
   
-
-
 jobs:
   build:
 
