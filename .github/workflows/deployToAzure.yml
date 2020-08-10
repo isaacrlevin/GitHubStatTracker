@@ -37,7 +37,7 @@ jobs:
         # Note: set the environment varibles defined in nuget.config using the values in secrets - Lance M.
         TELERIK_FEED_USERNAME: ${{ secrets.TelerikUserName  }}
         TELERIK_FEED_PASSWORD: ${{ secrets.TelerikPassword }}
-      run: dotnet restore src/GitHubStatTracker.Web/GitHubStatTracker.Web.csproj --configfile=src/nuget.config --runtime linux-x64
+      run: dotnet restore src/GitHubStatTracker.Web/GitHubStatTracker.Web.csproj --configfile=src/nuget.config --runtime linux-x64 && dotnet restore src/GitHubStatTracker.Function/GitHubStatTracker.Function.csproj --configfile=src/nuget.config --runtime linux-x64
         
 
     - name: 'Build Function'
@@ -59,7 +59,7 @@ jobs:
       shell: bash
       run: |
         pushd './${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
-        dotnet build --configuration Release --output ./output
+        dotnet publish --configuration Release --output ./output
         popd
 
     - name: Azure WebApp
