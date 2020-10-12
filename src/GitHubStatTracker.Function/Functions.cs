@@ -36,8 +36,8 @@ namespace GitHubStatTracker.Function
         [FunctionName("GHSTTrackReposTimer")]
         public async void GHSTTrackReposTimer([TimerTrigger("0 0 8 * * *")] TimerInfo myTimer, ILogger log, ExecutionContext context)
         {
-            log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
-            await ghst.Run();
+           log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
+           await ghst.Run();
         }
 
         [FunctionName("GHSTTrackReposHttp")]
@@ -53,8 +53,8 @@ namespace GitHubStatTracker.Function
         [FunctionName("PBITrackReposTimer")]
         public async void PBITrackReposTimer([TimerTrigger("0 0 8 * * *")] TimerInfo myTimer, ILogger log, ExecutionContext context)
         {
-            log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
-            await pbi.Run();
+           log.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
+           await pbi.Run();
         }
 
         [FunctionName("PBITrackReposHttp")]
