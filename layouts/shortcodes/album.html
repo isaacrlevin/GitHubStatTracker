@@ -1,0 +1,9 @@
+<!-- put bunch of photos in /static/img/albumName -->
+<!-- and insert shortcode "album albumName" in blogpost.md -->
+<center>
+    {{ $albumUrl := print "/static/images/" }}
+    {{ range readDir $albumUrl }}
+        {{ $imgURL := print "images/" .Name | absURL }}
+        <img height="300px" style="margin: 10px" src="{{ $imgURL }}"/>
+    {{ end }}
+    </center>
