@@ -45,37 +45,42 @@ namespace GitHubStatTracker.Function
 
             foreach (Campaign campaign in campaigns)
             {
-                if (!string.IsNullOrEmpty(campaign.CampaignName) && !string.IsNullOrEmpty(campaign.OrgName))
-                    foreach (Repo repo in campaign.Repos)
-                    {
-                        if (!string.IsNullOrEmpty(repo.RepoName))
+                try
+                {
+                    if (!string.IsNullOrEmpty(campaign.CampaignName) && !string.IsNullOrEmpty(campaign.OrgName))
+                        foreach (Repo repo in campaign.Repos)
                         {
-                            var views = await client.Repository.Traffic.GetViews(campaign.OrgName, repo.RepoName, new RepositoryTrafficRequest(TrafficDayOrWeek.Day));
-                            var clones = await client.Repository.Traffic.GetClones(campaign.OrgName, repo.RepoName, new RepositoryTrafficRequest(TrafficDayOrWeek.Day));
-                            foreach (var item in views.Views)
+                            if (!string.IsNullOrEmpty(repo.RepoName))
                             {
-                                var stat = new RepoStats($"{campaign.CampaignName}{repo.RepoName}", item.Timestamp.UtcDateTime.ToShortDateString().Replace("/", ""))
+                                var views = await client.Repository.Traffic.GetViews(campaign.OrgName, repo.RepoName, new RepositoryTrafficRequest(TrafficDayOrWeek.Day));
+                                var clones = await client.Repository.Traffic.GetClones(campaign.OrgName, repo.RepoName, new RepositoryTrafficRequest(TrafficDayOrWeek.Day));
+                                foreach (var item in views.Views)
                                 {
-                                    OrgName = campaign.OrgName,
-                                    CampaignName = campaign.CampaignName,
-                                    RepoName = repo.RepoName,
-                                    Date = item.Timestamp.UtcDateTime.ToShortDateString(),
-                                    Views = item.Count,
-                                    UniqueUsers = item.Uniques
-                                };
+                                    var stat = new RepoStats($"{campaign.CampaignName}{repo.RepoName}", item.Timestamp.UtcDateTime.ToShortDateString().Replace("/", ""))
+                                    {
+                                        OrgName = campaign.OrgName,
+                                        CampaignName = campaign.CampaignName,
+                                        RepoName = repo.RepoName,
+                                        Date = item.Timestamp.UtcDateTime.ToShortDateString(),
+                                        Views = item.Count,
+                                        UniqueUsers = item.Uniques
+                                    };
 
-                                var clone = clones.Clones.Where(a => a.Timestamp.UtcDateTime.ToShortDateString() == item.Timestamp.UtcDateTime.ToShortDateString()).FirstOrDefault();
+                                    var clone = clones.Clones.Where(a => a.Timestamp.UtcDateTime.ToShortDateString() == item.Timestamp.UtcDateTime.ToShortDateString()).FirstOrDefault();
 
-                                if (clone != null)
-                                {
-                                    stat.Clones = clone.Count;
-                                    stat.UniqueClones = clone.Uniques;
+                                    if (clone != null)
+                                    {
+                                        stat.Clones = clone.Count;
+                                        stat.UniqueClones = clone.Uniques;
+                                    }
+                                    stats.Add(stat);
                                 }
-                                stats.Add(stat);
+                                Thread.Sleep(5000);
                             }
-                            Thread.Sleep(5000);
                         }
-                    }
+                }
+                catch (Exception e)
+                { }
             }
 
             string tableName = "RepoStats";

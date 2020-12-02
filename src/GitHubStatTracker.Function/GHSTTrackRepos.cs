@@ -39,49 +39,57 @@ namespace GitHubStatTracker.Function
             }
 
 
-            foreach (var repo in repos.Where(a => dateArray.Contains(a.Date)))
+            //foreach (var repo in repos.Where(a => dateArray.Contains(a.Date)))
+            foreach (var repo in repos)
             {
-                _gitHubService.AuthClient(repo.AccessToken);
-
-                var todayRepo = await _gitHubService.GetRepository(repo.RepoId);
-
-                var views = await _gitHubService.GetRepoViews(repo.RepoId);
-                var clones = await _gitHubService.GetRepoClones(repo.RepoId);
-                foreach (var view in views.Views)
+                try
                 {
-                    var stat = new RepoStatEntity($"{repo.UserName}{repo.RepoName}", view.Timestamp.DateTime.ToShortDateString().Replace("/", ""))
-                    {
-                        AccessToken = repo.AccessToken,
-                        RepoName = repo.RepoName,
-                        Date = view.Timestamp.DateTime.ToShortDateString(),
-                        RepoId = repo.RepoId,
-                        UserName = repo.UserName,
-                        SyncEnabled = repo.SyncEnabled,
+                    _gitHubService.AuthClient(repo.AccessToken);
 
-                        Views = view.Count,
-                        UniqueUsers = view.Uniques
-                    };
+                    var todayRepo = await _gitHubService.GetRepository(repo.RepoId);
 
-                    if (stat.Date == DateTime.Now.ToShortDateString())
+                    var views = await _gitHubService.GetRepoViews(repo.RepoId);
+                    var clones = await _gitHubService.GetRepoClones(repo.RepoId);
+                    foreach (var view in views.Views)
                     {
-                        stat.StarCount = todayRepo.StargazersCount;
-                        stat.ForksCount = todayRepo.ForksCount;
+                        var stat = new RepoStatEntity($"{repo.UserName}{repo.RepoName}", view.Timestamp.DateTime.ToShortDateString().Replace("/", ""))
+                        {
+                            AccessToken = repo.AccessToken,
+                            RepoName = repo.RepoName,
+                            Date = view.Timestamp.DateTime.ToShortDateString(),
+                            RepoId = repo.RepoId,
+                            UserName = repo.UserName,
+                            SyncEnabled = repo.SyncEnabled,
+
+                            Views = view.Count,
+                            UniqueUsers = view.Uniques
+                        };
+
+                        if (stat.Date == DateTime.Now.ToShortDateString())
+                        {
+                            stat.StarCount = todayRepo.StargazersCount;
+                            stat.ForksCount = todayRepo.ForksCount;
+                        }
+                        else
+                        {
+                            stat.ForksCount = repo.ForksCount;
+                            stat.StarCount = repo.StarCount;
+                        }
+
+
+                        var clone = clones.Clones.Where(a => a.Timestamp.DateTime.ToShortDateString() == view.Timestamp.DateTime.ToShortDateString()).FirstOrDefault();
+
+                        if (clone != null)
+                        {
+                            stat.Clones = clone.Count;
+                            stat.UniqueClones = clone.Uniques;
+                        }
+                        stats.Add(stat);
                     }
-                    else
-                    {
-                        stat.ForksCount = repo.ForksCount;
-                        stat.StarCount = repo.StarCount;
-                    }
-
-
-                    var clone = clones.Clones.Where(a => a.Timestamp.DateTime.ToShortDateString() == view.Timestamp.DateTime.ToShortDateString()).FirstOrDefault();
-
-                    if (clone != null)
-                    {
-                        stat.Clones = clone.Count;
-                        stat.UniqueClones = clone.Uniques;
-                    }
-                    stats.Add(stat);
+                }
+                catch (Exception e)
+                {
+                    var foo = e.Message;
                 }
             }
 
