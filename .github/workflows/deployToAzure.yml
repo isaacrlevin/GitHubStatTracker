@@ -26,7 +26,7 @@ jobs:
         dotnet-version: 3.1.301
         
     - name: Setup NuGet.exe for use with actions
-      uses: NuGet/setup-nuget@v1.0.2
+      uses: NuGet/setup-nuget@v1.0.5
       with:
         # NuGet version to install. Can be `latest`, `preview`, a concrete version like `5.3.1`, or a semver range specifier like `5.x`.
         nuget-version: 'latest'
@@ -48,7 +48,7 @@ jobs:
         popd
 
     - name: 'Run Azure Functions Action'
-      uses: Azure/functions-action@v1
+      uses: Azure/functions-action@v1.1.8
       id: fa
       with:
         app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
