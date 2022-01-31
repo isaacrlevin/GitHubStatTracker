@@ -35,4 +35,5 @@ namespace GitHubStatTracker.Web.Extensions
                     select scheme).Any();
         }
     }
+
 }

@@ -24,23 +24,34 @@
                     {
                         <div class="centering text-center">
                             <h1>GitHub Traffic Data for @FullModel.Repo.Name</h1>
+                            <span> Insights being collected since @FullModel.Repo.SyncSince.Value.ToShortDateString()</span>
                         </div>
-                        <br /><br /><br />
+                        <br />
+                        <br />
+
+                        <br />
                         <div style="width:100%">
                             <div style="width:50%; float:left;">
-                                <span> Insights being collected since @FullModel.Repo.SyncSince.Value.ToShortDateString()</span>
+                                <label class="k-label">Graph Units</label>
+                                <br />
+                                <TelerikDropDownList Data="@units" TextField="Text" ValueField="Text" @bind-Value="selectedUnit" OnChange="@FitChanged">
+                                </TelerikDropDownList>
                             </div>
                             <div style="width:50%; float: right">
                                 <TelerikDateRangePicker StartValue="@StartValue"
-                                                        EndValue="@EndValue"
-                                                        StartValueChanged="@( (DateTime? sV) => StartValueChangedHandler(sV) )"
-                                                        EndValueChanged="@( (DateTime? eV) => EndValueChangedHandler(eV) )">
+                                                EndValue="@EndValue"
+                                                StartValueChanged="@( (DateTime? sV) => StartValueChangedHandler(sV) )"
+                                                EndValueChanged="@( (DateTime? eV) => EndValueChangedHandler(eV) )">
                                 </TelerikDateRangePicker>
                             </div>
                         </div>
-                        <br /><br />
-                        <br /><br />
-                              <hr class="style-eight" />
+                        <br />
+
+                        <br />
+                        <br />
+
+                        <br />
+                        <hr class="style-eight" />
                         @if (Model?.CloneSummary != null && Model?.CloneSummary.Count > 0)
                         {
                             var cloneTitle = $"GitHub Clones for {@Model.Repo.Name}";
@@ -49,26 +60,26 @@
                                 <ChartTooltip Visible="true" Shared="true"></ChartTooltip>
                                 <ChartSeriesItems>
                                     <ChartSeries Type="ChartSeriesType.Line"
-                                                 Name="Clones"
-                                                 Data="@Model.CloneSummary"
-                                                 CategoryField="Date"
-                                                 Field="Count"
-                                                 Style="ChartSeriesStyle.Normal">
+                                     Name="Clones"
+                                     Data="@Model.CloneSummary"
+                                     CategoryField="Date"
+                                     Field="Count"
+                                     Style="ChartSeriesStyle.Normal">
                                         <ChartSeriesMarkers Visible="false" />
                                     </ChartSeries>
 
                                     <ChartSeries Type="ChartSeriesType.Line"
-                                                 Name="Unique Clones"
-                                                 Data="@Model.CloneSummary"
-                                                 CategoryField="Date"
-                                                 Field="Uniques"
-                                                 Style="ChartSeriesStyle.Normal">
+                                     Name="Unique Clones"
+                                     Data="@Model.CloneSummary"
+                                     CategoryField="Date"
+                                     Field="Uniques"
+                                     Style="ChartSeriesStyle.Normal">
                                         <ChartSeriesMarkers Visible="false" />
                                     </ChartSeries>
 
                                 </ChartSeriesItems>
                                 <ChartCategoryAxes>
-                                    <ChartCategoryAxis BaseUnit="ChartCategoryAxisBaseUnit.Days" WeekStartDay="1" Type="ChartCategoryAxisType.Date">
+                                    <ChartCategoryAxis BaseUnit="@unit" WeekStartDay="1" Type="ChartCategoryAxisType.Date">
                                         <ChartCategoryAxisLabels>
                                             <ChartCategoryAxisLabelsRotation Angle="-90"></ChartCategoryAxisLabelsRotation>
                                         </ChartCategoryAxisLabels>
@@ -95,26 +106,26 @@
                                 <ChartTooltip Visible="true" Shared="true"></ChartTooltip>
                                 <ChartSeriesItems>
                                     <ChartSeries Type="ChartSeriesType.Line"
-                                                 Name="Views"
-                                                 Data="@Model.ViewSummary"
-                                                 CategoryField="Date"
-                                                 Field="Count"
-                                                 Style="ChartSeriesStyle.Normal">
+                                     Name="Views"
+                                     Data="@Model.ViewSummary"
+                                     CategoryField="Date"
+                                     Field="Count"
+                                     Style="ChartSeriesStyle.Normal">
                                         <ChartSeriesMarkers Visible="false" />
                                     </ChartSeries>
 
                                     <ChartSeries Type="ChartSeriesType.Line"
-                                                 Name="Unique Views"
-                                                 Data="@Model.ViewSummary"
-                                                 CategoryField="Date"
-                                                 Field="Uniques"
-                                                 Style="ChartSeriesStyle.Normal">
+                                     Name="Unique Views"
+                                     Data="@Model.ViewSummary"
+                                     CategoryField="Date"
+                                     Field="Uniques"
+                                     Style="ChartSeriesStyle.Normal">
                                         <ChartSeriesMarkers Visible="false" />
                                     </ChartSeries>
 
                                 </ChartSeriesItems>
                                 <ChartCategoryAxes>
-                                    <ChartCategoryAxis BaseUnit="ChartCategoryAxisBaseUnit.Days" WeekStartDay="1" Type="ChartCategoryAxisType.Date">
+                                    <ChartCategoryAxis BaseUnit="@unit" WeekStartDay="1" Type="ChartCategoryAxisType.Date">
                                         <ChartCategoryAxisLabels>
                                             <ChartCategoryAxisLabelsRotation Angle="-90"></ChartCategoryAxisLabelsRotation>
                                         </ChartCategoryAxisLabels>
@@ -141,17 +152,17 @@
                                 <ChartTooltip Visible="true" Shared="true"></ChartTooltip>
                                 <ChartSeriesItems>
                                     <ChartSeries Type="ChartSeriesType.Line"
-                                                 Name="Stars"
-                                                 Data="@Model.StarsSummary"
-                                                 CategoryField="Date"
-                                                 Field="Count"
-                                                 Style="ChartSeriesStyle.Normal">
+                                     Name="Stars"
+                                     Data="@Model.StarsSummary"
+                                     CategoryField="Date"
+                                     Field="Count"
+                                     Style="ChartSeriesStyle.Normal">
                                         <ChartSeriesMarkers Visible="false" />
                                     </ChartSeries>
 
                                 </ChartSeriesItems>
                                 <ChartCategoryAxes>
-                                    <ChartCategoryAxis BaseUnit="ChartCategoryAxisBaseUnit.Days" WeekStartDay="1" Type="ChartCategoryAxisType.Date">
+                                    <ChartCategoryAxis BaseUnit="@unit" WeekStartDay="1" Type="ChartCategoryAxisType.Date">
                                         <ChartCategoryAxisLabels>
                                             <ChartCategoryAxisLabelsRotation Angle="-90"></ChartCategoryAxisLabelsRotation>
                                         </ChartCategoryAxisLabels>
@@ -178,17 +189,17 @@
                                 <ChartTooltip Visible="true" Shared="true"></ChartTooltip>
                                 <ChartSeriesItems>
                                     <ChartSeries Type="ChartSeriesType.Line"
-                                                 Name="Forks"
-                                                 Data="@Model.ForksSummary"
-                                                 CategoryField="Date"
-                                                 Field="Count"
-                                                 Style="ChartSeriesStyle.Normal">
+                                     Name="Forks"
+                                     Data="@Model.ForksSummary"
+                                     CategoryField="Date"
+                                     Field="Count"
+                                     Style="ChartSeriesStyle.Normal">
                                         <ChartSeriesMarkers Visible="false" />
                                     </ChartSeries>
 
                                 </ChartSeriesItems>
                                 <ChartCategoryAxes>
-                                    <ChartCategoryAxis BaseUnit="ChartCategoryAxisBaseUnit.Days" WeekStartDay="1" Type="ChartCategoryAxisType.Date">
+                                    <ChartCategoryAxis BaseUnit="@unit" WeekStartDay="1" Type="ChartCategoryAxisType.Date">
                                         <ChartCategoryAxisLabels>
                                             <ChartCategoryAxisLabelsRotation Angle="-90"></ChartCategoryAxisLabelsRotation>
                                         </ChartCategoryAxisLabels>
@@ -225,10 +236,41 @@
 
     public DateTime? StartValue { get; set; }
     public DateTime? EndValue { get; set; } = DateTime.Now;
+    ChartCategoryAxisBaseUnit unit = ChartCategoryAxisBaseUnit.Fit;
+
+    //in a real case, the model is usually in a separate file
+    //the model type and value field type must be provided to the dropdpownlist
+    public class UnitModel
+    {
+        public string Text { get; set; }
+    }
+    string selectedUnit { get; set; }
+    List<UnitModel> units = new List<UnitModel>();
 
 
     protected override async Task OnInitializedAsync()
     {
+
+        units = new List<UnitModel>
+        {
+            new UnitModel
+            {
+             Text = "Fit"
+            },
+            new UnitModel
+            {
+             Text = "Days"
+            },
+            new UnitModel
+            {
+             Text = "Months"
+            },
+            new UnitModel
+            {
+             Text = "Years"
+            }
+        };
+        selectedUnit = "Fit";
         FullModel = new TrafficViewModel();
         Model = new TrafficViewModel();
         var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
@@ -241,6 +283,31 @@
                 FullModel.Repo.SyncSince = FullModel.ViewSummary.OrderBy(a => a.Date).FirstOrDefault().Date;
                 Model = (TrafficViewModel)FullModel.DeepClone();
                 StartValue = Model.Repo.SyncSince;
+            }
+        }
+    }
+
+    void FitChanged(object e)
+    {
+        if (e is not null)
+        {
+            switch ((string)e)
+            {
+                case "Fit":
+                    unit = ChartCategoryAxisBaseUnit.Fit;
+                    break;
+                case "Days":
+                    unit = ChartCategoryAxisBaseUnit.Days;
+                    break;
+                case "Months":
+                    unit = ChartCategoryAxisBaseUnit.Months;
+                    break;
+                    case "Years":
+                    unit = ChartCategoryAxisBaseUnit.Years;
+                    break;
+                default:
+                    unit = ChartCategoryAxisBaseUnit.Fit;
+                    break;
             }
         }
     }
