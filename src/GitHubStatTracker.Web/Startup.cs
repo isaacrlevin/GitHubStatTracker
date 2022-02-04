@@ -50,7 +50,6 @@ namespace GitHubStatTracker.Web
                 options.ClientSecret = Configuration["GitHub:ClientSecret"];
                 options.Scope.Add("user");
                 options.Scope.Add("repo");
-                options.Scope.Add("admin:org");
                 options.SaveTokens = true;
             });
 
